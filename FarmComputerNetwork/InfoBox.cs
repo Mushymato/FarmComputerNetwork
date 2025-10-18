@@ -14,11 +14,15 @@ public sealed class FarmComputerInfoBox : IClickableMenu
     private readonly string? infoTextCol1 = null;
     private readonly string? infoTextCol2 = null;
 
+    private static readonly Color bgColor = Color.Black * 0.6f;
+    private static readonly Color txColor = Color.White * 0.9f;
+    private static readonly Color bdColor = Color.CornflowerBlue * 0.7f;
+
     public FarmComputerInfoBox(SObject farmComputer)
         : base(0, 0, 400, 400, false)
     {
         location = farmComputer.Location;
-        displayName = farmComputer.Location.DisplayName;
+        displayName = ModEntry.GetLocationDisplayName(location);
 
         #region build info text
         StringBuilder sb1 = new();
@@ -125,10 +129,10 @@ public sealed class FarmComputerInfoBox : IClickableMenu
             b,
             new Rectangle(64, yOffset, (int)(titleSize.X + 32), (int)(titleSize.Y + 8)),
             4,
-            borderColor: Color.Wheat * 0.5f,
-            backgroundColor: Color.Black * 0.5f
+            borderColor: bdColor,
+            backgroundColor: bgColor
         );
-        b.DrawString(Game1.dialogueFont, displayName, new Vector2(64 + 16, yOffset + 6), Color.White);
+        b.DrawString(Game1.dialogueFont, displayName, new Vector2(64 + 16, yOffset + 6), txColor);
         yOffset += (int)titleSize.Y + 8;
         yOffset += 16;
 
@@ -136,23 +140,18 @@ public sealed class FarmComputerInfoBox : IClickableMenu
             b,
             new Rectangle(64, yOffset, (int)(col1Size.X + 32), (int)(col1Size.Y + 8)),
             4,
-            borderColor: Color.Wheat * 0.5f,
-            backgroundColor: Color.Black * 0.5f
+            borderColor: bdColor,
+            backgroundColor: bgColor
         );
-        b.DrawString(Game1.dialogueFont, infoTextCol1, new Vector2(64 + 16, yOffset + 6), Color.White);
+        b.DrawString(Game1.dialogueFont, infoTextCol1, new Vector2(64 + 16, yOffset + 6), txColor);
 
         Utility.DrawSquare(
             b,
             new Rectangle((int)(64 + 40 + col1Size.X), yOffset, (int)(col2Size.X + 32), (int)(col2Size.Y + 8)),
             4,
-            borderColor: Color.Wheat * 0.5f,
-            backgroundColor: Color.Black * 0.5f
+            borderColor: bdColor,
+            backgroundColor: bgColor
         );
-        b.DrawString(
-            Game1.dialogueFont,
-            infoTextCol2,
-            new Vector2(64 + 40 + 16 + col1Size.X, yOffset + 6),
-            Color.White
-        );
+        b.DrawString(Game1.dialogueFont, infoTextCol2, new Vector2(64 + 40 + 16 + col1Size.X, yOffset + 6), txColor);
     }
 }

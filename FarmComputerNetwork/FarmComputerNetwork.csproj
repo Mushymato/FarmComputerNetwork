@@ -11,12 +11,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Name>FarmComputerNetwork</Name>
+    <Name>Farm Computer Network</Name>
     <Authors>mushymato</Authors>
-    <Description>DESCRIPTION</Description>
+    <Description>Adds networked farm computers that allows you to remotely view other networked farm computers.</Description>
     <UniqueId>mushymato.FarmComputerNetwork</UniqueId>
-    <UpdateKeys>Nexus:???</UpdateKeys>
-    <Version>0.1.0</Version>
+    <UpdateKeys>Nexus:38677</UpdateKeys>
+    <Version>1.0.0</Version>
     <MinimumApiVersion_Behavior>UpdateFull</MinimumApiVersion_Behavior>
     <MinimumGameVersion_Behavior>UpdateFull</MinimumGameVersion_Behavior>
     <Dependencies_VersionBehavior>UpdateFull</Dependencies_VersionBehavior>

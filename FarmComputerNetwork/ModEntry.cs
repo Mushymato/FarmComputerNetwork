@@ -14,8 +14,6 @@ public sealed class ModEntry : Mod
 #else
     private const LogLevel DEFAULT_LOG_LEVEL = LogLevel.Trace;
 #endif
-    internal const string FarmComputerInteractMethod =
-        "FarmComputerNetwork.ModEntry, FarmComputerNetwork: InteractShowFarmComputerNetwork";
     public const string ModId = "mushymato.FarmComputerNetwork";
 
     private static IMonitor? mon;
@@ -29,6 +27,15 @@ public sealed class ModEntry : Mod
 
         helper.ConsoleCommands.Add("fcn-remoteview", "Show remote viewing for some location", ConsoleRemoteView);
         helper.Events.Content.AssetRequested += AssetManager.OnAssetRequested;
+        helper.Events.World.ObjectListChanged += FarmComputerWatcher.OnObjectListChanged;
+        helper.Events.GameLoop.SaveLoaded += FarmComputerWatcher.OnSaveLoaded;
+        helper.Events.GameLoop.DayStarted += FarmComputerWatcher.OnDayStarted;
+        helper.Events.GameLoop.ReturnedToTitle += FarmComputerWatcher.OnReturnedToTitle;
+    }
+
+    internal static string GetLocationDisplayName(GameLocation location)
+    {
+        return location.GetDisplayName() ?? location.Name;
     }
 
     /// <summary>
@@ -40,36 +47,24 @@ public sealed class ModEntry : Mod
     /// <returns></returns>
     public static bool InteractShowFarmComputerNetwork(SObject machine, GameLocation location, Farmer player)
     {
-        List<KeyValuePair<string, string>> responses = [];
-        Dictionary<string, SObject> foundFarmComputers = [];
+        if (machine.Location == null)
+            return false;
 
-        // todo: optimize away
-        Utility.ForEachLocation(location =>
+        Dictionary<string, SObject> networkedFarmComputers = FarmComputerWatcher.GetNetwork(machine, player);
+        List<KeyValuePair<string, string>> responses = [];
+        foreach ((string key, SObject comp) in networkedFarmComputers)
         {
-            foreach (SObject locMachine in location.Objects.Values)
-            {
-                if (locMachine.GetMachineData()?.InteractMethod == FarmComputerInteractMethod)
-                {
-                    string key = $"FC_{location.NameOrUniqueName}_{locMachine.TileLocation}";
-                    responses.Add(
-                        new(key, $"{location.DisplayName} ({locMachine.TileLocation.X}, {locMachine.TileLocation.Y})")
-                    );
-                    foundFarmComputers[key] = locMachine;
-                    Log(key);
-                }
-            }
-            return true;
-        });
+            responses.Add(new(key, comp.DisplayName));
+        }
 
         location.ShowPagedResponses(
             Game1.content.LoadString($"{AssetManager.ModStrings}:interact.question"),
             responses,
             obj =>
             {
-                if (!foundFarmComputers.TryGetValue(obj, out SObject? farmcomp))
-                {
+                if (!networkedFarmComputers.TryGetValue(obj, out SObject? farmcomp))
                     return;
-                }
+                location.localSound("DwarvishSentry");
                 rvManagerPS.Value.BeginRemoteView(farmcomp, player);
             },
             auto_select_single_choice: true

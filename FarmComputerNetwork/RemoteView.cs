@@ -1,9 +1,10 @@
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Locations;
+using StardewValley.Menus;
 
 namespace FarmComputerNetwork;
 
@@ -12,18 +13,22 @@ internal sealed class RemoteView(
     Farmer player,
     GameLocation priorLocation,
     xTile.Dimensions.Location priorViewport
-)
+) : IDisposable
 {
-    private static readonly MethodInfo? SObject_ShowFarmComputerReport = typeof(SObject).GetMethod(
-        "ShowFarmComputerReport",
-        BindingFlags.NonPublic | BindingFlags.Instance
-    );
     private bool isViewing = false;
     private double? panningSince = null;
     private double panningSpeedFactor = 1.0;
     private bool prevDisplayHUD = false;
-    private Point prevTilePoint = player.TilePoint;
-    private int prevFacing = player.FacingDirection;
+    private Point prevTilePoint = Point.Zero;
+    private int prevFacing = 0;
+
+    public void Dispose()
+    {
+        if (isViewing)
+        {
+            StopViewing();
+        }
+    }
 
     internal bool BeginViewing()
     {
@@ -34,13 +39,16 @@ internal sealed class RemoteView(
         }
         if (farmComputer == null || farmComputer.Location == null)
         {
-            ModEntry.Log("farmcomputer location is null", LogLevel.Error);
+            ModEntry.Log("farm computer location is null", LogLevel.Error);
             return false;
         }
 
         GameLocation viewLocation = farmComputer.Location;
 
         ModEntry.Log($"Remote view {farmComputer.Location}");
+
+        prevTilePoint = player.TilePoint;
+        prevFacing = player.FacingDirection;
 
         Game1.currentLocation = viewLocation;
         player.viewingLocation.Value = viewLocation.NameOrUniqueName;
@@ -59,7 +67,6 @@ internal sealed class RemoteView(
         prevDisplayHUD = Game1.displayHUD;
         Game1.displayHUD = false;
 
-        // SObject_ShowFarmComputerReport?.Invoke(farmComputer, [player]);
         Game1.activeClickableMenu = new FarmComputerInfoBox(farmComputer);
 
         isViewing = true;
@@ -74,6 +81,10 @@ internal sealed class RemoteView(
 
         locationRequest.OnWarp += () =>
         {
+            player.setTileLocation(prevTilePoint.ToVector2());
+            player.faceDirection(prevFacing);
+            prevTilePoint = Point.Zero;
+            prevFacing = 0;
             player.viewingLocation.Value = null;
             Game1.viewportFreeze = false;
             Game1.viewport.Location = priorViewport;
@@ -89,7 +100,15 @@ internal sealed class RemoteView(
 
     internal bool Update(GameTime time)
     {
-        if (!isViewing || Game1.IsFading())
+        if (!isViewing)
+            return false;
+
+        if (farmComputer.Location is not FarmHouse && farmComputer.Location != priorLocation)
+        {
+            farmComputer.updateWhenCurrentLocation(time);
+        }
+
+        if (Game1.IsFading())
             return false;
 
         if (Game1.activeClickableMenu is null)

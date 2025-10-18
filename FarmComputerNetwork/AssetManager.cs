@@ -1,8 +1,10 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewValley;
 using StardewValley.GameData;
 using StardewValley.GameData.BigCraftables;
+using StardewValley.GameData.Locations;
 using StardewValley.GameData.Machines;
 
 namespace FarmComputerNetwork;
@@ -12,6 +14,8 @@ internal class AssetManager
     internal const string FarmComputerId = $"{ModEntry.ModId}_FarmComputer";
     internal const string FarmComputerQId = $"(BC){FarmComputerId}";
     internal const string FarmComputerTexture = $"{FarmComputerId}/Texture";
+    internal const string FarmComputerInteractMethod =
+        "FarmComputerNetwork.ModEntry, FarmComputerNetwork: InteractShowFarmComputerNetwork";
     internal const string ModStrings = $"{ModEntry.ModId}/Strings";
 
     internal static void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
@@ -71,13 +75,19 @@ internal class AssetManager
     private static void Edit_DataMachines(IAssetData asset)
     {
         IDictionary<string, MachineData> data = asset.AsDictionary<string, MachineData>().Data;
-        data[FarmComputerQId] = new() { InteractMethod = ModEntry.FarmComputerInteractMethod };
+        data[FarmComputerQId] = new()
+        {
+            InteractMethod = FarmComputerInteractMethod,
+            WobbleWhileWorking = false,
+            AllowFairyDust = false,
+            WorkingEffects = [new() { Frames = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], Interval = 100 }],
+        };
     }
 
     private static void Edit_DataCraftingRecipes(IAssetData asset)
     {
         IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
-        data[FarmComputerQId] = $"(BC)239 1 82 5/Home/{FarmComputerQId}/true/null/";
+        data[FarmComputerQId] = $"(BC)239 1 82 10/Home/{FarmComputerQId}/true/null/";
     }
 
     private static void Edit_DataTriggerActions(IAssetData asset)

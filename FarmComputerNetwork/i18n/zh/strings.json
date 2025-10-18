@@ -1,0 +1,9 @@
+{
+  "interact.question": "农场电脑网络",
+  "bc.displayname": "农场终端",
+  "bc.description": "采用矮人技术增强的农场电脑，从一个电脑终端可以查看所有其他电脑终端。",
+  "info.is-farm": "农场？ ",
+  "info.fruit-trees-ready": "可收成果树：",
+  "info.bushes-ready": "可收成灌木：",
+  "location-name.FarmHouse": "农舍"
+}

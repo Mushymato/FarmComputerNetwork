@@ -1,8 +1,10 @@
 {
   "interact.question": "Farm Computer Network",
-  "bc.displayname": "Farm Computer++",
-  "bc.description": "Scans the farm and displays useful information, access any placed Farm Computer++ from any other Farm Computer++.",
+  "bc.displayname": "Farm Terminal",
+  "bc.description": "Farm computer enhanced with dwarven technology. Access any of your placed farm terminals from any other terminal.",
+  "naming.question": "Name this farm computer",
   "info.is-farm": "Is Farm? ",
   "info.fruit-trees-ready": "Fruit Trees Ready: ",
-  "info.bushes-ready": "Bushes Ready: "
+  "info.bushes-ready": "Bushes Ready: ",
+  "location-name.FarmHouse": "Farmhouse"
 }
