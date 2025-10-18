@@ -1,10 +1,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewValley;
 using StardewValley.GameData;
 using StardewValley.GameData.BigCraftables;
-using StardewValley.GameData.Locations;
 using StardewValley.GameData.Machines;
 
 namespace FarmComputerNetwork;
