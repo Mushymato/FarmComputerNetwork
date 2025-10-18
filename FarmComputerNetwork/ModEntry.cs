@@ -24,6 +24,7 @@ public sealed class ModEntry : Mod
         mon = Monitor;
 
         rvManagerPS = new(() => new(helper));
+        AssetManager.directoryPath = helper.DirectoryPath;
 
         helper.ConsoleCommands.Add("fcn-remoteview", "Show remote viewing for some location", ConsoleRemoteView);
         helper.Events.Content.AssetRequested += AssetManager.OnAssetRequested;

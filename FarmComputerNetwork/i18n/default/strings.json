@@ -2,7 +2,7 @@
   "interact.question": "Farm Computer Network",
   "bc.displayname": "Farm Terminal",
   "bc.description": "Farm computer enhanced with dwarven technology. Access any of your placed farm terminals from any other terminal.",
-  "naming.question": "Name this farm computer",
+  "naming.question": "Name this farm terminal",
   "info.is-farm": "Is Farm? ",
   "info.fruit-trees-ready": "Fruit Trees Ready: ",
   "info.bushes-ready": "Bushes Ready: ",

@@ -15,6 +15,7 @@ internal class AssetManager
     internal const string FarmComputerInteractMethod =
         "FarmComputerNetwork.ModEntry, FarmComputerNetwork: InteractShowFarmComputerNetwork";
     internal const string ModStrings = $"{ModEntry.ModId}/Strings";
+    internal static string directoryPath = null!;
 
     internal static void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
     {
@@ -38,10 +39,10 @@ internal class AssetManager
         {
             e.LoadFromModFile<Texture2D>("assets/farmcomputer.png", AssetLoadPriority.Low);
         }
-        else if (e.Name.IsEquivalentTo(ModStrings))
+        else if (e.NameWithoutLocale.IsEquivalentTo(ModStrings))
         {
             string stringsAsset = Path.Combine("i18n", e.Name.LanguageCode?.ToString() ?? "default", "strings.json");
-            if (File.Exists(stringsAsset))
+            if (File.Exists(Path.Combine(directoryPath, stringsAsset)))
             {
                 e.LoadFromModFile<Dictionary<string, string>>(stringsAsset, AssetLoadPriority.Low);
             }
