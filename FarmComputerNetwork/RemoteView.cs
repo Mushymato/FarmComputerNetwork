@@ -21,6 +21,9 @@ internal sealed class RemoteView(
     private bool isViewing = false;
     private double? panningSince = null;
     private double panningSpeedFactor = 1.0;
+    private bool prevDisplayHUD = false;
+    private Point prevTilePoint = player.TilePoint;
+    private int prevFacing = player.FacingDirection;
 
     internal bool BeginViewing()
     {
@@ -35,7 +38,7 @@ internal sealed class RemoteView(
             return false;
         }
 
-        GameLocation viewLocation = (farmComputer.Location ?? player.currentLocation).GetRootLocation();
+        GameLocation viewLocation = farmComputer.Location;
 
         ModEntry.Log($"Remote view {farmComputer.Location}");
 
@@ -53,8 +56,11 @@ internal sealed class RemoteView(
         Game1.clampViewportToGameMap();
         Game1.panScreen(0, 0);
         Game1.displayFarmer = false;
+        prevDisplayHUD = Game1.displayHUD;
+        Game1.displayHUD = false;
 
-        SObject_ShowFarmComputerReport?.Invoke(farmComputer, [player]);
+        // SObject_ShowFarmComputerReport?.Invoke(farmComputer, [player]);
+        Game1.activeClickableMenu = new FarmComputerInfoBox(farmComputer);
 
         isViewing = true;
         return true;
@@ -69,16 +75,16 @@ internal sealed class RemoteView(
         locationRequest.OnWarp += () =>
         {
             player.viewingLocation.Value = null;
-            Game1.displayHUD = true;
             Game1.viewportFreeze = false;
             Game1.viewport.Location = priorViewport;
             Game1.displayFarmer = true;
+            Game1.displayHUD = prevDisplayHUD;
         };
 
         isViewing = false;
         panningSince = null;
 
-        Game1.warpFarmer(locationRequest, player.TilePoint.X, player.TilePoint.Y, player.FacingDirection);
+        Game1.warpFarmer(locationRequest, prevTilePoint.X, prevTilePoint.Y, prevFacing);
     }
 
     internal bool Update(GameTime time)
@@ -144,7 +150,10 @@ internal sealed class RemoteView(
         {
             panningSince ??= time.TotalGameTime.TotalMilliseconds;
             panningSpeedFactor = Math.Min(3, 1 + (time.TotalGameTime.TotalMilliseconds - panningSince.Value) / 1000f);
+            bool priorPaused = Game1.netWorldState.Value.IsPaused;
+            Game1.netWorldState.Value.IsPaused = true;
             Game1.panScreen((int)(panX * panningSpeedFactor), (int)(panY * panningSpeedFactor));
+            Game1.netWorldState.Value.IsPaused = priorPaused;
         }
         else
         {

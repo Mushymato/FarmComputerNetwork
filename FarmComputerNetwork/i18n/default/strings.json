@@ -1,0 +1,8 @@
+{
+  "interact.question": "Farm Computer Network",
+  "bc.displayname": "Farm Computer++",
+  "bc.description": "Scans the farm and displays useful information, access any placed Farm Computer++ from any other Farm Computer++.",
+  "info.is-farm": "Is Farm? ",
+  "info.fruit-trees-ready": "Fruit Trees Ready: ",
+  "info.bushes-ready": "Bushes Ready: "
+}

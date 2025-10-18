@@ -1,14 +1,9 @@
 global using SObject = StardewValley.Object;
 using System.Diagnostics;
-using Force.DeepCloner;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
-using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
-using StardewValley.GameData.BigCraftables;
-using StardewValley.GameData.Machines;
 
 namespace FarmComputerNetwork;
 
@@ -19,91 +14,55 @@ public sealed class ModEntry : Mod
 #else
     private const LogLevel DEFAULT_LOG_LEVEL = LogLevel.Trace;
 #endif
-
-    public const string ModId = "mushymato.FarmComputerNetwork";
-    internal const string FarmComputerId = $"{ModId}_FarmComputer";
-    internal const string FarmComputerTexture = $"{FarmComputerId}/Texture";
-    internal const string FarmComputerQId = $"(BC){FarmComputerId}";
-    private const string FarmComputerInteractMethod =
+    internal const string FarmComputerInteractMethod =
         "FarmComputerNetwork.ModEntry, FarmComputerNetwork: InteractShowFarmComputerNetwork";
+    public const string ModId = "mushymato.FarmComputerNetwork";
+
     private static IMonitor? mon;
     private static PerScreen<RemoteViewManager> rvManagerPS = null!;
 
     public override void Entry(IModHelper helper)
     {
-        I18n.Init(helper.Translation);
         mon = Monitor;
 
         rvManagerPS = new(() => new(helper));
 
         helper.ConsoleCommands.Add("fcn-remoteview", "Show remote viewing for some location", ConsoleRemoteView);
-        helper.Events.Content.AssetRequested += OnAssetRequested;
+        helper.Events.Content.AssetRequested += AssetManager.OnAssetRequested;
     }
 
-    private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
-    {
-        if (e.Name.IsEquivalentTo("Data/BigCraftables"))
-        {
-            e.Edit(Edit_DataBigCraftables, AssetEditPriority.Early);
-        }
-        if (e.Name.IsEquivalentTo("Data/Machines"))
-        {
-            e.Edit(Edit_DataMachines, AssetEditPriority.Default);
-        }
-        if (e.Name.IsEquivalentTo(FarmComputerTexture))
-        {
-            e.LoadFromModFile<Texture2D>("assets/farmcomputer.png", AssetLoadPriority.Low);
-        }
-    }
-
-    private void Edit_DataBigCraftables(IAssetData asset)
-    {
-        IDictionary<string, BigCraftableData> data = asset.AsDictionary<string, BigCraftableData>().Data;
-        BigCraftableData farmComputerClone = data["239"].ShallowClone();
-        farmComputerClone.DisplayName += "+";
-        farmComputerClone.Texture = FarmComputerTexture;
-        farmComputerClone.SpriteIndex = 0;
-        data[FarmComputerId] = farmComputerClone;
-    }
-
-    private void Edit_DataMachines(IAssetData asset)
-    {
-        IDictionary<string, MachineData> data = asset.AsDictionary<string, MachineData>().Data;
-        data[FarmComputerQId] = new() { InteractMethod = FarmComputerInteractMethod };
-    }
-
+    /// <summary>
+    /// This is called via 'FarmComputerNetwork.ModEntry, FarmComputerNetwork: InteractShowFarmComputerNetwork'
+    /// </summary>
+    /// <param name="machine"></param>
+    /// <param name="location"></param>
+    /// <param name="player"></param>
+    /// <returns></returns>
     public static bool InteractShowFarmComputerNetwork(SObject machine, GameLocation location, Farmer player)
     {
         List<KeyValuePair<string, string>> responses = [];
         Dictionary<string, SObject> foundFarmComputers = [];
-        HashSet<GameLocation> processedLocations = [];
 
         // todo: optimize away
         Utility.ForEachLocation(location =>
         {
-            GameLocation rootLocation = location.GetRootLocation();
-            if (processedLocations.Contains(rootLocation))
-            {
-                return true;
-            }
-            foreach (SObject locMachine in rootLocation.Objects.Values)
+            foreach (SObject locMachine in location.Objects.Values)
             {
                 if (locMachine.GetMachineData()?.InteractMethod == FarmComputerInteractMethod)
                 {
                     string key = $"FC_{location.NameOrUniqueName}_{locMachine.TileLocation}";
                     responses.Add(
-                        new(key, $"{location.DisplayName}({locMachine.TileLocation.X}, {locMachine.TileLocation.Y})")
+                        new(key, $"{location.DisplayName} ({locMachine.TileLocation.X}, {locMachine.TileLocation.Y})")
                     );
                     foundFarmComputers[key] = locMachine;
                     Log(key);
                 }
             }
-            processedLocations.Add(rootLocation);
             return true;
         });
 
         location.ShowPagedResponses(
-            I18n.Interact_Question(),
+            Game1.content.LoadString($"{AssetManager.ModStrings}:interact.question"),
             responses,
             obj =>
             {
