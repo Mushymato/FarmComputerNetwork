@@ -1,3 +1,4 @@
+using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
@@ -68,6 +69,7 @@ internal static class FarmComputerWatcher
     {
         foreach ((_, SObject removed) in e.Removed)
         {
+            removed.modData.Remove(ModData_FarmComputerName);
             knownFarmComputers.Remove(removed);
         }
 
@@ -76,16 +78,19 @@ internal static class FarmComputerWatcher
             if (added.IsFarmComputerPP())
             {
                 knownFarmComputers.Add(added);
-                NamingMenu namingMenu =
-                    new(
-                        name => NameComputer(added, name),
-                        Game1.content.LoadString($"{AssetManager.ModStrings}:naming.question"),
-                        ModEntry.GetLocationDisplayName(added.Location)
-                    );
-                if (Game1.activeClickableMenu != null)
-                    Game1.nextClickableMenu.Add(namingMenu);
-                else
-                    Game1.activeClickableMenu = namingMenu;
+                if (!added.modData.ContainsKey(ModData_FarmComputerName))
+                {
+                    NamingMenu namingMenu =
+                        new(
+                            name => NameComputer(added, name),
+                            Game1.content.LoadString($"{AssetManager.ModStrings}:naming.question"),
+                            ModEntry.GetLocationDisplayName(added.Location)
+                        );
+                    if (Game1.activeClickableMenu != null)
+                        Game1.nextClickableMenu.Add(namingMenu);
+                    else
+                        Game1.activeClickableMenu = namingMenu;
+                }
                 SetWorkingState(added);
             }
         }
