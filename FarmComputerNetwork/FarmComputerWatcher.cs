@@ -67,6 +67,9 @@ internal static class FarmComputerWatcher
 
     internal static void OnObjectListChanged(object? sender, ObjectListChangedEventArgs e)
     {
+        if (!e.IsCurrentLocation)
+            return;
+
         foreach ((_, SObject removed) in e.Removed)
         {
             removed.modData.Remove(ModData_FarmComputerName);
