@@ -120,49 +120,72 @@ internal sealed class RemoteView(
         int panX = 0;
         int panY = 0;
 
-        Keys[] pressedKeys = Game1.oldKBState.GetPressedKeys();
-        foreach (Keys key in pressedKeys)
+        if (Game1.options.gamepadControls)
         {
-            if (Game1.options.doesInputListContain(Game1.options.menuButton, key))
+            GamePadState gamePadState = Game1.input.GetGamePadState();
+            if (gamePadState.ThumbSticks.Left.X < -0.25)
             {
-                StopViewing();
-                return true;
+                panX -= 8;
             }
-            if (Game1.options.doesInputListContain(Game1.options.moveDownButton, key))
+            else if (gamePadState.ThumbSticks.Left.X > 0.25)
             {
-                panY += 4;
+                panX += 8;
             }
-            else if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
+            if (gamePadState.ThumbSticks.Left.Y > 0.25)
             {
-                panX += 4;
+                panY -= 8;
             }
-            else if (Game1.options.doesInputListContain(Game1.options.moveUpButton, key))
+            else if (gamePadState.ThumbSticks.Left.Y < -0.25)
             {
-                panY -= 4;
-            }
-            else if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
-            {
-                panX -= 4;
+                panY += 8;
             }
         }
+        else
+        {
+            Keys[] pressedKeys = Game1.oldKBState.GetPressedKeys();
+            foreach (Keys key in pressedKeys)
+            {
+                if (Game1.options.doesInputListContain(Game1.options.menuButton, key))
+                {
+                    StopViewing();
+                    return true;
+                }
+                if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
+                {
+                    panX -= 4;
+                }
+                else if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
+                {
+                    panX += 4;
+                }
+                else if (Game1.options.doesInputListContain(Game1.options.moveUpButton, key))
+                {
+                    panY -= 4;
+                }
+                else if (Game1.options.doesInputListContain(Game1.options.moveDownButton, key))
+                {
+                    panY += 4;
+                }
+            }
 
-        int mouseXDelta = Game1.getOldMouseX(ui_scale: false) + Game1.viewport.X;
-        int mouseYDelta = Game1.getOldMouseY(ui_scale: false) + Game1.viewport.Y;
-        if (mouseXDelta - Game1.viewport.X < 64)
-        {
-            panX -= 8;
-        }
-        else if (mouseXDelta - (Game1.viewport.X + Game1.viewport.Width) >= -128)
-        {
-            panX += 8;
-        }
-        if (mouseYDelta - Game1.viewport.Y < 64)
-        {
-            panY -= 8;
-        }
-        else if (mouseYDelta - (Game1.viewport.Y + Game1.viewport.Height) >= -64)
-        {
-            panY += 8;
+            int mouseXDelta = Game1.getOldMouseX(ui_scale: false) + Game1.viewport.X;
+            int mouseYDelta = Game1.getOldMouseY(ui_scale: false) + Game1.viewport.Y;
+            if (mouseXDelta - Game1.viewport.X < 64)
+            {
+                panX -= 8;
+            }
+            else if (mouseXDelta - (Game1.viewport.X + Game1.viewport.Width) >= -128)
+            {
+                panX += 8;
+            }
+            if (mouseYDelta - Game1.viewport.Y < 64)
+            {
+                panY -= 8;
+            }
+            else if (mouseYDelta - (Game1.viewport.Y + Game1.viewport.Height) >= -64)
+            {
+                panY += 8;
+            }
         }
 
         if (panX != 0 || panY != 0)

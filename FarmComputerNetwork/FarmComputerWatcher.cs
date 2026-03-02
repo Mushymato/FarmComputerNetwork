@@ -83,12 +83,11 @@ internal static class FarmComputerWatcher
                 knownFarmComputers.Add(added);
                 if (!added.modData.ContainsKey(ModData_FarmComputerName))
                 {
-                    NamingMenu namingMenu =
-                        new(
-                            name => NameComputer(added, name),
-                            Game1.content.LoadString($"{AssetManager.ModStrings}:naming.question"),
-                            ModEntry.GetLocationDisplayName(added.Location)
-                        );
+                    NamingMenu namingMenu = new(
+                        name => NameComputer(added, name),
+                        Game1.content.LoadString($"{AssetManager.ModStrings}:naming.question"),
+                        ModEntry.GetLocationDisplayName(added.Location)
+                    );
                     if (Game1.activeClickableMenu != null)
                         Game1.nextClickableMenu.Add(namingMenu);
                     else
