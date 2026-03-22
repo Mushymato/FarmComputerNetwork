@@ -10,6 +10,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <EnableHarmony>true</EnableHarmony>
+    <ModZipPath>$(MSBuildThisFileDirectory)/../_releases</ModZipPath>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -17,11 +18,12 @@
     <Authors>mushymato</Authors>
     <Description>Adds networked farm computers that allows you to remotely view other networked farm computers.</Description>
     <UniqueId>mushymato.FarmComputerNetwork</UniqueId>
-    <UpdateKeys>Nexus:38677</UpdateKeys>
+    <UpdateKeys>Nexus:38677,GitHub:Mushymato/FarmComputerNetwork</UpdateKeys>
     <Version>1.0.2</Version>
-    <MinimumApiVersion_Behavior>UpdateFull</MinimumApiVersion_Behavior>
+    <BaseManifest>new</BaseManifest>
+    <MinimumApiVersion_Behavior>Update</MinimumApiVersion_Behavior>
     <MinimumGameVersion_Behavior>UpdateFull</MinimumGameVersion_Behavior>
-    <Dependencies_VersionBehavior>UpdateFull</Dependencies_VersionBehavior>
+    <Dependencies_VersionBehavior>Update</Dependencies_VersionBehavior>
   </PropertyGroup>
 
   <ItemGroup>
